@@ -9,7 +9,7 @@
 import os
 import telebot
 from yt_dlp import YoutubeDL
-BOT_TOKEN = "Bot_Token_gir"
+BOT_TOKEN = "8110267443:AAHNAgx0Yleg6JKLXomoTuhB_zEte-g-8HI"
 bot = telebot.TeleBot(BOT_TOKEN, parse_mode="HTML")
 
 
