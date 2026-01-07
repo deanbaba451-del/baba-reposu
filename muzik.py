@@ -31,20 +31,20 @@ def start(message):
 
     if kanal_katildi not in ["member", "administrator", "creator"] or grup_katildi not in ["member", "administrator", "creator"]:
         mesaj = f"*Merhaba* 🥰 {message.from_user.first_name},\n\n*Beni kullanabilmek için  Aşağıdaki kanal ve gruba katılmalısın😊*"
-        kanala_katil = telebot.types.InlineKeyboardButton("𝐊𝐚𝐧𝐚𝐥𝐚 𝐊𝐚𝐭ı𝐥", url="https://t.me/iskocyaduyuru")
-        gruba_katil = telebot.types.InlineKeyboardButton("𝐆𝐫𝐮𝐛𝐚 𝐊𝐚𝐭ı𝐥", url="https://t.me/iskocyadevleti")
+        kanala_katil = telebot.types.InlineKeyboardButton("𝐊𝐚𝐧𝐚𝐥𝐚 𝐊𝐚𝐭ı𝐥", url="https://t.me/alnaseerh")
+        gruba_katil = telebot.types.InlineKeyboardButton("𝐆𝐫𝐮𝐛𝐚 𝐊𝐚𝐭ı𝐥", url="https://t.me/rwssiasohbet")
         butonlar = telebot.types.InlineKeyboardMarkup(row_width=2)
         butonlar.add(kanala_katil, gruba_katil)
         photo_url = 'https://t.me/iskocyalog/5964'
         bot.send_photo(message.chat.id, photo=photo_url, caption=mesaj, reply_markup=butonlar,parse_mode="Markdown")
     else:
-        photo_url = 'https://t.me/iskocyalog/5964'
+        photo_url = ''
         mesaj = ("*Merhaba*🎀\n\n"
                  "*Ben Bir Muzik Botuyum Beni kullanmaya başlayabilirsin.*\n"
        
-                 "*En güncel haberler için @iskocyaduyuru kanalında kal!*")
+                 "*En güncel haberler için @https://t.me/alnaseerh kanalında kal!*")
         butonlar = telebot.types.InlineKeyboardMarkup()
-        gruba_ekle = telebot.types.InlineKeyboardButton("➕ 𝐁𝐞𝐧𝐢 𝐆𝐫𝐮𝐛𝐚 𝐄𝐤𝐥𝐞", url="https://t.me/muzik_indiren_bot?startgroup=CallToneBot")
+        gruba_ekle = telebot.types.InlineKeyboardButton("➕ 𝐁𝐞𝐧𝐢 𝐆𝐫𝐮𝐛𝐚 𝐄𝐤𝐥𝐞", url="https://t.me/kendimizebot?startgroup=CallToneBot")
         iletisim = telebot.types.InlineKeyboardButton("⛧ 𝐓𝐡𝐨𝐦𝐚𝐬 ⛧", url="https://t.me/t5omasr")
         muzik_indir = telebot.types.InlineKeyboardButton("𝐌𝐮𝐳𝐢𝐤 𝐈𝐧𝐝𝐢𝐫 🎧", callback_data="muzik_indir")
         butonlar.row(iletisim, gruba_ekle)
@@ -109,7 +109,7 @@ def indir(message):
             f"🥷🏻 *Sanatçı:* *{sanatci}*\n"
             f"━━━━━━━━━━━━━━━━━━━\n"
             f"*{sure_str}*\n\n"
-            f"*Telegram:* @t5omasr / @maybethomas"
+            f"*Telegram:* @cekmem / @sabikasizim"
         )
 
         with open(dosya_adi, 'rb') as audio:
