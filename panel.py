@@ -88,7 +88,7 @@ def sory():
     sori = "Zeynalovs"
 
     if soriy == "y":
-    	with open("/storage/emulated/0/Sory.txt", "w", encoding="utf-8") as f:
+        with open("rolex.txt", "w", encoding="utf-8") as f:
     		f.write(sori + "\n\n\n")
     		f.write(oc)
     		print("Sonuç Rolex.txt dosyasına kaydedildi.")
