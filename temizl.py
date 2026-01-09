@@ -1,18 +1,39 @@
-# temizle.py
+# temizl_turkce.py
 
-# Orijinal ve yeni dosya isimleri
 input_file = "sovus.py"
 output_file = "sovus_clean.py"
 
-# Dosyayı oku ve temizle
-with open(input_file, "rb") as f:
-    content_bytes = f.read()
+# Türkçe karakterler ve standart ASCII
+allowed_chars = (
+    "abcdefghijklmnopqrstuvwxyz"
+    "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+    "0123456789"
+    "çğıöşüÇĞİÖŞÜ"
+    " \t\n\r.,:;!?()[]{}+-=*/%\"'<>@#$^&_`|~\\"
+)
 
-# UTF-8 dışındaki karakterleri ignore ederek decode et
-clean_content = content_bytes.decode("utf-8", errors="ignore")
+try:
+    # Orijinal dosyayı oku
+    with open(input_file, "rb") as f:
+        content_bytes = f.read()
+    
+    # UTF-8 olarak decode et (ignore ile problemli byte’ları at)
+    content = content_bytes.decode("utf-8", errors="ignore")
 
-# Temizlenmiş içeriği yeni dosyaya yaz
-with open(output_file, "w", encoding="utf-8") as f:
-    f.write(clean_content)
+    # Yalnızca allowed_chars içindekileri tut
+    clean_content = "".join(c for c in content if c in allowed_chars)
 
-print(f"Dosya temizlendi ve '{output_file}' olarak kaydedildi.")
+    # Dosyanın başına encoding bildirimi ekle
+    encoding_header = "# -*- coding: utf-8 -*-\n"
+    clean_content = encoding_header + clean_content
+
+    # Yeni dosyaya yaz
+    with open(output_file, "w", encoding="utf-8") as f:
+        f.write(clean_content)
+
+    print(f"Dosya temizlendi ve '{output_file}' olarak kaydedildi. Türkçe karakterler korundu!")
+
+except FileNotFoundError:
+    print(f"Hata: '{input_file}' dosyası bulunamadı.")
+except Exception as e:
+    print(f"Beklenmeyen bir hata oluştu: {e}")
