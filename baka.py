@@ -50,17 +50,19 @@ async def process(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if audiofile.tag is None:
         audiofile.initTag()
 
-    audiofile.tag.title = data["title"]
-    audiofile.tag.artist = data["artist"]
-
-    # Mevcut kapakları sil
+    # Mevcut kapakları tamamen sil
     audiofile.tag.images.remove(lambda x: True)
 
     # Yeni kapak ekle
     with open(cover_path, "rb") as img:
         audiofile.tag.images.set(3, img.read(), "image/jpeg")
 
-    audiofile.tag.save()
+    # Başlık ve sanatçı
+    audiofile.tag.title = data["title"]
+    audiofile.tag.artist = data["artist"]
+
+    # Zorla kaydet (ID3v2.3 ile)
+    audiofile.tag.save(version=eyed3.id3.ID3_V2_3)
 
     await update.message.reply_audio(audio=open(data["file"], "rb"))
     await update.message.reply_text("İşlem tamam! /new ile yeniden başlayabilirsin.")
