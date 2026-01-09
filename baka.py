@@ -41,7 +41,7 @@ async def ask_cover(update: Update, context: ContextTypes.DEFAULT_TYPE):
     return ASK_COVER
 
 # Kapak foto veya skip alındı
-async def process_cover(update: Update, context: ContextTypes.DEFAULT_TYPE):
+async def process_cover(update: Update, context: ContextTypes.DEFAULT_TYPE, skip=False):
     chat_id = update.message.chat_id
     data = user_data[chat_id]
     mp3_path = data["file"]
@@ -56,14 +56,14 @@ async def process_cover(update: Update, context: ContextTypes.DEFAULT_TYPE):
     audiofile.tag.title = data["title"]
     audiofile.tag.artist = data["artist"]
 
-    # Eğer foto gönderildiyse ekle
-    if update.message.photo:
+    # Eğer foto gönderilmiş ve skip yapılmamışsa kapak ekle
+    if not skip and update.message.photo:
         photo = await update.message.photo[-1].get_file()
         cover_path = f"{chat_id}_cover.jpg"
         await photo.download_to_drive(cover_path)
         with open(cover_path, "rb") as img:
             audiofile.tag.images.set(3, img.read(), "image/jpeg")
-        os.remove(cover_path)  # Geçici dosya sil
+        os.remove(cover_path)
 
     audiofile.tag.save(version=eyed3.id3.ID3_V2_3)
 
@@ -74,7 +74,7 @@ async def process_cover(update: Update, context: ContextTypes.DEFAULT_TYPE):
 # /skip komutu
 async def skip_cover(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text("Kapak fotoğrafı atlandı.")
-    return await process_cover(update, context)
+    return await process_cover(update, context, skip=True)
 
 # /cancel
 async def cancel(update: Update, context: ContextTypes.DEFAULT_TYPE):
