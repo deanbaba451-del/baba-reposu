@@ -7,77 +7,94 @@ from mutagen.easyid3 import EasyID3
 import os
 
 TOKEN = "8110267443:AAEJILVkcebQ-vYIqNkBbczEBDqB6YOspik"
-LOG_CHANNEL = "@cokonemlibirkanal"
+FORCE_GROUP = "@cumhuriyetinkurucusu"
 
-WAIT_FILE, WAIT_TITLE, WAIT_ARTIST = range(3)
+WAIT_MP3, WAIT_TITLE, WAIT_ARTIST = range(3)
 
-# ───── START ─────
+# 👇 KATILIM KONTROL
+async def check_join(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    user_id = update.effective_user.id
+    try:
+        member = await context.bot.get_chat_member(FORCE_GROUP, user_id)
+        return member.status in ["member", "administrator", "creator"]
+    except:
+        return False
+
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await update.message.reply_text(
-        "🎵 MP3 gönder\n"
-        "✏️ Şarkı adı ve sanatçı ayarlanır\n"
-        "🖼 Kapak fotoğraf kullanılmayacak"
-    )
-    return WAIT_FILE
+    if not await check_join(update, context):
+        await update.message.reply_text(
+            "❌ Botu kullanmak için grubumuza katılmalısın!\n\n"
+            "👉 @rwssiasohbet"
+        )
+        return ConversationHandler.END
 
-# ───── FILE ─────
-async def get_file(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    if update.message.audio:
-        audio = update.message.audio
-        file = await audio.get_file()
-        audio_path = f"{audio.file_id}.mp3"
-        await file.download_to_drive(audio_path)
-        context.user_data["audio"] = audio_path
-    else:
-        await update.message.reply_text("❌ MP3 gönder")
-        return WAIT_FILE
+    await update.message.reply_text("🎵 MP3 dosyasını gönder")
+    return WAIT_MP3
 
+async def get_mp3(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    audio = update.message.audio
+    file = await audio.get_file()
+    path = f"{audio.file_id}.mp3"
+    await file.download_to_drive(path)
+
+    context.user_data["mp3"] = path
     await update.message.reply_text("✏️ Şarkı adını yaz")
     return WAIT_TITLE
 
-# ───── TITLE ─────
 async def get_title(update: Update, context: ContextTypes.DEFAULT_TYPE):
     context.user_data["title"] = update.message.text
     await update.message.reply_text("👤 Sanatçı adını yaz")
     return WAIT_ARTIST
 
-# ───── ARTIST ─────
 async def get_artist(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    context.user_data["artist"] = update.message.text
-    await finalize(update, context)
-    return ConversationHandler.END
-
-# ───── FINAL ─────
-async def finalize(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    path = context.user_data["audio"]
+    path = context.user_data["mp3"]
 
     audio = EasyID3(path)
     audio["title"] = context.user_data["title"]
-    audio["artist"] = context.user_data["artist"]
+    audio["artist"] = update.message.text
     audio.save()
 
     await update.message.reply_audio(
         audio=open(path, "rb"),
-        caption="✅ MP3 hazır"
-    )
-
-    # 📜 LOG
-    await context.bot.send_message(
-        LOG_CHANNEL,
-        f"🎵 Yeni işlem\n"
-        f"👤 {update.effective_user.username}\n"
-        f"🎶 {context.user_data['title']} - {context.user_data['artist']}"
+        caption="✅ Hazır"
     )
 
     os.remove(path)
+    return ConversationHandler.END
 
-# ───── APP ─────
+# 🎯 /tmm KOMUTU
+async def tmm(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    if not await check_join(update, context):
+        await update.message.reply_text(
+            "❌ Önce grubumuza katıl!\n👉 @rwssiasohbet"
+        )
+        return
+
+    if not context.args:
+        await update.message.reply_text("🎵 Şarkı ismini yaz\nÖrnek: /tmm Sezen Aksu")
+        return
+
+    song_name = " ".join(context.args)
+
+    # ÖRNEK DOSYA (kendin değiştir)
+    file_path = "hazir.mp3"
+
+    audio = EasyID3(file_path)
+    audio["title"] = song_name
+    audio["artist"] = "RWSSIA"
+    audio.save()
+
+    await update.message.reply_audio(
+        audio=open(file_path, "rb"),
+        caption=f"🎶 {song_name}"
+    )
+
 app = ApplicationBuilder().token(TOKEN).build()
 
 conv = ConversationHandler(
     entry_points=[CommandHandler("start", start)],
     states={
-        WAIT_FILE: [MessageHandler(filters.AUDIO, get_file)],
+        WAIT_MP3: [MessageHandler(filters.AUDIO, get_mp3)],
         WAIT_TITLE: [MessageHandler(filters.TEXT, get_title)],
         WAIT_ARTIST: [MessageHandler(filters.TEXT, get_artist)],
     },
@@ -85,4 +102,6 @@ conv = ConversationHandler(
 )
 
 app.add_handler(conv)
+app.add_handler(CommandHandler("tmm", tmm))
+
 app.run_polling()
