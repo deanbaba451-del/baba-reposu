@@ -12,7 +12,7 @@ import os
 
 WAIT_MP3, WAIT_TITLE, WAIT_ARTIST = range(3)
 
-TOKEN = "BOT_TOKEN_BURAYA"
+TOKEN = "8110267443:AAEJILVkcebQ-vYIqNkBbczEBDqB6YOspik"
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text("🎵 MP3 dosyasını gönder")
