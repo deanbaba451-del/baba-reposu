@@ -53,7 +53,10 @@ async def process(update: Update, context: ContextTypes.DEFAULT_TYPE):
     audiofile.tag.title = data["title"]
     audiofile.tag.artist = data["artist"]
 
-    # Kapak foto ekleme
+    # Mevcut kapakları sil
+    audiofile.tag.images.remove(lambda x: True)
+
+    # Yeni kapak ekle
     with open(cover_path, "rb") as img:
         audiofile.tag.images.set(3, img.read(), "image/jpeg")
 
