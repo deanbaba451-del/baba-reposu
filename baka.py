@@ -50,16 +50,13 @@ async def process(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if audiofile.tag is None:
         audiofile.initTag()
 
-    # Mevcut kapakları tamamen sil
-    audiofile.tag.images.remove(lambda x: True)
-
-    # Yeni kapak ekle
-    with open(cover_path, "rb") as img:
-        audiofile.tag.images.set(3, img.read(), "image/jpeg")
-
     # Başlık ve sanatçı
     audiofile.tag.title = data["title"]
     audiofile.tag.artist = data["artist"]
+
+    # Yeni kapak eklemeden önce eski varsa üzerine yaz
+    with open(cover_path, "rb") as img:
+        audiofile.tag.images.set(3, img.read(), "image/jpeg")
 
     # Zorla kaydet (ID3v2.3 ile)
     audiofile.tag.save(version=eyed3.id3.ID3_V2_3)
