@@ -8,6 +8,7 @@ from telegram.ext import (
     filters
 )
 from mutagen.easyid3 import EasyID3
+from mutagen.id3 import ID3NoHeaderError
 import os
 
 WAIT_MP3, WAIT_TITLE, WAIT_ARTIST = range(3)
@@ -37,14 +38,20 @@ async def get_artist(update: Update, context: ContextTypes.DEFAULT_TYPE):
     artist = update.message.text
     path = context.user_data["mp3_path"]
 
-    audio = EasyID3(path)
+    # ID3 tag yoksa oluştur
+    try:
+        audio = EasyID3(path)
+    except ID3NoHeaderError:
+        audio = EasyID3()
+        audio.save(path)
+
     audio["title"] = context.user_data["title"]
     audio["artist"] = artist
     audio.save()
 
     await update.message.reply_audio(
         audio=open(path, "rb"),
-        caption="✅ değiştirildi"
+        caption="✅ Değiştirildi"
     )
 
     os.remove(path)
